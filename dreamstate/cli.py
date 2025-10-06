@@ -19,6 +19,15 @@ def _raise_error() -> NoReturn:
     )
 
 
+@ds.command()
+def about():
+    """Display information about the DreamState package manager."""
+    print("[bold blue]DreamState Package Manager[/bold blue]")
+    print("Version: [green]1.0.0[/green]")
+    print("Author: [yellow]RobotzDev[/yellow]")
+    print("License: [cyan]MIT[/cyan]")
+
+
 @ds.command(
     name="create-app",
     help="Start a project based on the provided boilerplate.",
@@ -36,7 +45,7 @@ def create_app(
     parent = Path(__file__).parent.resolve()
     path_template = parent.joinpath("templates", boilername)
 
-    for root, _, files in shutil.walk(path_template):
+    for root, _, files in path_template.walk():
         relative_path = Path(root).relative_to(path_template)
         target_dir = Path.cwd().joinpath(project_name, relative_path)
         target_dir.mkdir(parents=True, exist_ok=True)
