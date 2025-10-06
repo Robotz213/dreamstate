@@ -1,11 +1,9 @@
-import re
 import tempfile
 import zipfile
 from pathlib import Path
 from typing import NoReturn
 
 import requests
-from rich import print
 
 
 class URLNotFoundError(RuntimeError):
@@ -55,15 +53,17 @@ def _download_template(
     # 5️⃣ Extrai o conteúdo do .zip
     with zipfile.ZipFile(temp_dir, "r") as zip_ref:
         for member in zip_ref.namelist():
-            # Remove the top-level directory from the path
             parts = Path(member).parts
-            if len(parts) > 1:
-                target_path = path_template.joinpath(*parts[1:])
-            else:
-                target_path = path_template.joinpath(*parts)
+            # Ignora o diretório de nível superior
+            if len(parts) <= 1:
+                continue  # pula arquivos/diretórios no topo
+
+            target_path = path_template.joinpath(*parts[1:])
+
             if member.endswith("/"):
                 target_path.mkdir(parents=True, exist_ok=True)
-            else:
-                target_path.parent.mkdir(parents=True, exist_ok=True)
-                with zip_ref.open(member) as source:
-                    Path(target_path).write_bytes(source.read())
+                continue
+
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            with zip_ref.open(member) as source:
+                Path(target_path).write_bytes(source.read())
