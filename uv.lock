@@ -65,6 +65,12 @@ wheels = [
 ]
 
 [[package]]
+name = "clear"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/17/a0/04e3f6a87245d75956bd254f7e133493ed6e18b49e09c874204cbfe97f42/clear-2.0.0.tar.gz", hash = "sha256:fd6d42575ed65063edef3c46e65aa1b3fc05a144dc1691ba62033ffc35f46368", size = 2130, upload-time = "2023-02-10T14:43:15.648Z" }
+
+[[package]]
 name = "click"
 version = "8.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -90,6 +96,7 @@ name = "dreamstate"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "clear" },
     { name = "inquirer" },
     { name = "requests" },
     { name = "toml" },
@@ -98,6 +105,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "clear", specifier = ">=2.0.0" },
     { name = "inquirer", specifier = ">=3.4.1" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "toml", specifier = ">=0.10.2" },

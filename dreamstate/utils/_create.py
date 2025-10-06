@@ -5,6 +5,7 @@ from typing import NoReturn
 
 import inquirer
 import toml
+from clear import clear
 from rich import print
 
 from ._download import _download_template
@@ -20,6 +21,7 @@ def _create_project(
     boilerplate: str = "flask@default:latest",
     boilerplate_creator: str = "Robotz213",
 ) -> None:
+    clear()
     if "@" not in boilerplate:
         _raise_error()
 
@@ -59,13 +61,15 @@ def _create_project(
     toml_pyproject = path_template.joinpath("pyproject.toml")
 
     if toml_pyproject.exists():
-        with toml_pyproject.open("rb") as fp:
-            pyproject = toml.load(fp)
+        with toml_pyproject.open("r") as fp:
+            pyproject = toml.loads(fp.read())
 
         pyproject["project"]["name"] = project_name
-        pyproject["project"]["requires-python"] = f">={sys.version}"
+        pyproject["project"]["requires-python"] = (
+            f">={sys.version.split(' ')[0]}"
+        )
 
-        with toml_pyproject.open("wb") as fp:
+        with toml_pyproject.open("w") as fp:
             toml.dump(pyproject, fp)
 
     for root, _, files in path_template.walk():
@@ -79,5 +83,5 @@ def _create_project(
             shutil.copy2(src_file, dest_file)
 
     print(
-        f"[bold green]Project '{project_name}' created successfully![/bold green]",
+        f"[bold green]Project [bold cyan]'{project_name}'[/bold cyan] created successfully![/bold green]",
     )
