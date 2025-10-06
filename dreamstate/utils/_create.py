@@ -5,7 +5,7 @@ from typing import NoReturn
 import inquirer
 from rich import print
 
-from dreamstate.utils import _download_template
+from ._download import _download_template
 
 
 def _raise_error() -> NoReturn:
