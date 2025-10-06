@@ -1,0 +1,15 @@
+[project]
+name = "dreamstate"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "requests>=2.32.5",
+    "typer>=0.19.2",
+]
+
+
+[project.scripts]
+
+ds = "dreamstate.cli:ds"
