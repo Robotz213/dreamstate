@@ -8,12 +8,19 @@ import requests
 
 class URLNotFoundError(RuntimeError):
     def __init__(self, message: str, *args, **kwargs) -> None:
+        """Exception raised when the URL for the .zip file is not found."""
         super().__init__(message, *args, **kwargs)
 
 
 def _raise_error() -> NoReturn:
+    """Raise a URLNotFoundError indicating the .zip file URL was not found.
+
+    Raises:
+        URLNotFoundError: If the .zip file URL for the latest release is not found.
+
+    """
     raise URLNotFoundError(
-        message="❌ Não foi possível encontrar a URL do arquivo .zip da última release.",
+        message="❌ Could not find the .zip file URL for the latest release.",
     )
 
 
@@ -23,8 +30,16 @@ def _download_template(
     boilerplate_creator: str = "Robotz213",
     version: str = "latest",
 ) -> None:
-    """Download the template if it does not exist locally."""
-    # URL da página da última release
+    """Download the template from a GitHub release if it does not exist locally.
+
+    Args:
+        path_template (Path): The path where the template should be extracted.
+        boilername (str): The name of the boilerplate repository.
+        boilerplate_creator (str): The GitHub username or organization of the boilerplate creator.
+        version (str): The release version to download (default is 'latest').
+
+    """
+    # URL of the latest release page
     if version == "latest":
         api_url = f"https://api.github.com/repos/{boilerplate_creator}/{boilername}/releases/latest"
     else:
@@ -38,11 +53,11 @@ def _download_template(
     if not zip_url:
         _raise_error()
 
-    # 3️⃣ Faz o download do .zip
+    # Download the .zip file
     zip_resp = requests.get(zip_url, stream=True, timeout=120)
     zip_resp.raise_for_status()
 
-    # 4️⃣ Salva no disco
+    # Save to disk
 
     temp_dir = Path(tempfile.mkdtemp()).joinpath("source.zip")
 
@@ -50,13 +65,13 @@ def _download_template(
         for chunk in zip_resp.iter_content(chunk_size=8192):
             f.write(chunk)
 
-    # 5️⃣ Extrai o conteúdo do .zip
+    # Extract the contents of the .zip file
     with zipfile.ZipFile(temp_dir, "r") as zip_ref:
         for member in zip_ref.namelist():
             parts = Path(member).parts
-            # Ignora o diretório de nível superior
+            # Ignore the top-level directory
             if len(parts) <= 1:
-                continue  # pula arquivos/diretórios no topo
+                continue  # skip files/directories at the top
 
             target_path = path_template.joinpath(*parts[1:])
 

@@ -8,7 +8,7 @@ import inquirer
 from rich import print
 from typer import Typer
 
-from dreamstate.utils import _download_template
+from dreamstate.utils import __display_info, _download_template
 
 ds = Typer(
     name="DreamState Package Manager",
@@ -18,17 +18,20 @@ ds = Typer(
 
 def _raise_error() -> NoReturn:
     raise ValueError(
-        message="Argumento boilerplate precisa conter '<framework>@'<version>' (exemplo: 'flask@default')",
+        message="The boilerplate argument must contain '<framework>@<version>' (example: 'flask@default').",
     )
 
 
 @ds.command()
 def about() -> None:
     """Display information about the DreamState package manager."""
-    print("[bold blue]DreamState Package Manager[/bold blue]")
-    print("Version: [green]1.0.0[/green]")
-    print("Author: [yellow]RobotzDev[/yellow]")
-    print("License: [cyan]MIT[/cyan]")
+    __display_info()
+
+
+@ds.command()
+def version() -> None:
+    """Display information about the DreamState package manager."""
+    __display_info()
 
 
 @ds.command(
