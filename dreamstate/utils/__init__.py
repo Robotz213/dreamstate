@@ -2,6 +2,7 @@
 
 from rich import print
 
+from ._create import _create_project
 from ._download import _download_template
 
 
@@ -15,4 +16,4 @@ def __display_info() -> None:
     )
 
 
-__all__ = ["_download_template", __display_info]
+__all__ = ["_download_template", __display_info, "_create_project"]
