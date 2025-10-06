@@ -4,6 +4,7 @@ import shutil
 from pathlib import Path
 from typing import NoReturn
 
+import inquirer
 from rich import print
 from typer import Typer
 
@@ -37,11 +38,29 @@ def about() -> None:
 def create_app(
     boilerplate: str = "flask@default:latest",
     boilerplate_creator: str = "Robotz213",
-    project_name: str = "my_project",
 ) -> None:
     """Create a new DreamState project based on the provided boilerplate."""
     if "@" not in boilerplate:
         _raise_error()
+
+    ask_list = [
+        inquirer.Text(
+            "project_name",
+            message="Project name (default: my_project)",
+            default="my_project",
+            autocomplete="my_project",
+        ),
+    ]
+
+    answers = inquirer.prompt(ask_list)
+    project_name: str = (
+        answers["project_name"]
+        if answers and answers.get("project_name")
+        else "my_project"
+    )
+
+    if KeyboardInterrupt:
+        return
 
     boiler_app, version = boilerplate.split("@")
     boilername = f"{boiler_app}_{version.split(':')[0]}"
@@ -67,5 +86,5 @@ def create_app(
             shutil.copy2(src_file, dest_file)
 
     print(
-        f"[bold green]Projeto '{project_name}' criado com sucesso![/bold green]",
+        f"[bold green]Project '{project_name}' created successfully![/bold green]",
     )
