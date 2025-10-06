@@ -7,6 +7,8 @@ from typing import NoReturn
 from rich import print
 from typer import Typer
 
+from dreamstate.utils import _download_template
+
 ds = Typer(
     name="DreamState Package Manager",
     help="DreamState Package Manager CLI.",
@@ -20,7 +22,7 @@ def _raise_error() -> NoReturn:
 
 
 @ds.command()
-def about():
+def about() -> None:
     """Display information about the DreamState package manager."""
     print("[bold blue]DreamState Package Manager[/bold blue]")
     print("Version: [green]1.0.0[/green]")
@@ -33,7 +35,8 @@ def about():
     help="Start a project based on the provided boilerplate.",
 )
 def create_app(
-    boilerplate: str = "flask@default",
+    boilerplate: str = "flask@default:latest",
+    boilerplate_creator: str = "Robotz213",
     project_name: str = "my_project",
 ) -> None:
     """Create a new DreamState project based on the provided boilerplate."""
@@ -41,9 +44,17 @@ def create_app(
         _raise_error()
 
     boiler_app, version = boilerplate.split("@")
-    boilername = f"{boiler_app}_{version}"
+    boilername = f"{boiler_app}_{version.split(':')[0]}"
     parent = Path(__file__).parent.resolve()
     path_template = parent.joinpath("templates", boilername)
+
+    if not path_template.exists():
+        _download_template(
+            path_template=path_template,
+            boilername=boilername,
+            boilerplate_creator=boilerplate_creator,
+            version="latest",
+        )
 
     for root, _, files in path_template.walk():
         relative_path = Path(root).relative_to(path_template)
