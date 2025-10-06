@@ -59,9 +59,6 @@ def create_app(
         else "my_project"
     )
 
-    if KeyboardInterrupt:
-        return
-
     boiler_app, version = boilerplate.split("@")
     boilername = f"{boiler_app}_{version.split(':')[0]}"
     parent = Path(__file__).parent.resolve()

@@ -5,10 +5,16 @@ from pathlib import Path
 from typing import NoReturn
 
 import requests
+from rich import print
+
+
+class URLNotFoundError(RuntimeError):
+    def __init__(self, message: str, *args, **kwargs) -> None:
+        super().__init__(message, *args, **kwargs)
 
 
 def _raise_error() -> NoReturn:
-    raise RuntimeError(
+    raise URLNotFoundError(
         message="❌ Não foi possível encontrar a URL do arquivo .zip da última release.",
     )
 
@@ -21,22 +27,18 @@ def _download_template(
 ) -> None:
     """Download the template if it does not exist locally."""
     # URL da página da última release
-    latest_url = f"https://github.com/{boilerplate_creator}/{boilername}/releases/{version}"
+    if version == "latest":
+        api_url = f"https://api.github.com/repos/{boilerplate_creator}/{boilername}/releases/latest"
+    else:
+        api_url = f"https://api.github.com/repos/{boilerplate_creator}/{boilername}/releases/tags/{version}"
 
-    # 1️⃣ Pega o HTML da página "latest"
-    resp = requests.get(latest_url, timeout=120)
+    resp = requests.get(api_url, timeout=120)
     resp.raise_for_status()
-    html = resp.text
+    release_data = resp.json()
 
-    # 2️⃣ Extrai a URL do .zip da última tag usando regex
-    zip_url_match = re.search(
-        rf'https://github\.com/Robotz213/{boilerplate_creator}/{boilername}/archive/refs/tags/[^"]+\.zip',
-        html,
-    )
-    if not zip_url_match:
+    zip_url = release_data.get("zipball_url")
+    if not zip_url:
         _raise_error()
-
-    zip_url = zip_url_match.group(0)
 
     # 3️⃣ Faz o download do .zip
     zip_resp = requests.get(zip_url, stream=True, timeout=120)
