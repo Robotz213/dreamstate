@@ -1,8 +1,10 @@
 import shutil
+import sys
 from pathlib import Path
 from typing import NoReturn
 
 import inquirer
+import toml
 from rich import print
 
 from ._download import _download_template
@@ -37,6 +39,9 @@ def _create_project(
         else "my_project"
     )
 
+    if " " in project_name:
+        project_name = "_".join(project_name.split(" "))
+
     boiler_app, version = boilerplate.split("@")
     boilername = f"{boiler_app}_{version.split(':')[0]}"
     parent = Path(__file__).parent.resolve()
@@ -49,6 +54,19 @@ def _create_project(
             boilerplate_creator=boilerplate_creator,
             version="latest",
         )
+
+    pyproject = None
+    toml_pyproject = path_template.joinpath("pyproject.toml")
+
+    if toml_pyproject.exists():
+        with toml_pyproject.open("rb") as fp:
+            pyproject = toml.load(fp)
+
+        pyproject["project"]["name"] = project_name
+        pyproject["project"]["requires-python"] = f">={sys.version}"
+
+        with toml_pyproject.open("wb") as fp:
+            toml.dump(pyproject, fp)
 
     for root, _, files in path_template.walk():
         relative_path = Path(root).relative_to(path_template)
